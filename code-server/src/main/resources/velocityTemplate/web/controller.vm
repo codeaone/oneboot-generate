@@ -1,0 +1,206 @@
+package ${basepackage}.controller.${modelName};
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
+
+#foreach ($p in ${importPackages})
+import ${p};
+#end
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.codeaone.boot.core.exception.EbootException;
+import com.codeaone.boot.core.exception.CommonErrorCode;
+import com.codeaone.boot.core.logging.digest.annotations.DigestLogName;
+import com.codeaone.boot.mvc.file.ExcelObject;
+import com.codeaone.boot.mybatis.model.BaseSearcher;
+import com.codeaone.boot.mvc.BaseCommonController;
+
+import ${basepackage}.repository.searcher.${pojoName}SearchContext;
+import ${basepackage}.model.models.${pojoName};
+import ${basepackage}.repository.${pojoName}Repository;
+import com.codeaone.boot.mvc.base.BaseVO;
+
+/**
+ * 
+ * @author shiqiao.pro
+ * @see https://boot.codeaone.com
+ */
+@Controller
+@ResponseBody
+@DigestLogName("${modelName}s")
+@RequestMapping("/${modelName}s")
+@Validated
+public class ${pojoName}Controller extends BaseCommonController<${pojoName}, ${pojoName}Form, ${pojoName}VO> {
+
+	private static final String WARP_VO_CACHE_NAME = "${pojoNameLower}";
+
+	@Autowired
+	public ${pojoName}Controller(${pojoName}Repository repository) {
+		super(repository);
+	}
+
+	/**
+	 * 获取列表信息列表 GET /${pojoName}s
+	 * 
+	 * @param model
+	 * @param request
+	 */
+	@GetMapping
+	public Map<String, Object> doIndex(${pojoName}Form form) {
+		Map<String, Object> map = getSucceed();
+		map.put("data", getSearchData(form));
+		return map;
+	}
+
+	/**
+	 * 获取新建信息初始数据 GET /new
+	 * 
+	 * @param model
+	 */
+	@GetMapping("/new")
+	public Map<String, Object> doNew() {
+		Map<String, Object> map = getSucceed();
+		// map.put("test", EnumsUtil.toEnumObject(TestEnum.class));
+		// map.put("merchId", warpTheVoService.get("merchant"));
+#foreach ($op in ${ops})
+#if (${op.enums})
+        map.put("${op.name}", EnumsUtil.toEnumObject(${op.enumSimpleName}.class));
+#end
+#if (${op.mappingData})
+        map.put("${op.name}", warpTheVoService.get("${op.mappingDataName}"));
+#end
+#end
+		return map;
+	}
+
+	/**
+	 */
+	@Override
+	protected void warpTheVO(Object source, Object vo) {
+		// 可以进行内容转换 缓存的问题需要集中处理好
+		${pojoName}VO eVO = (${pojoName}VO) vo;
+#foreach ($op in ${ops})
+#if (${op.mappingData})
+        eVO.set${op.mappingDataNameFieldUp}(getWarpName(eVO.get${op.upName}(), "${op.mappingDataName}"));
+#end
+#end
+	}
+
+	/**
+	 * 新建信息 POST /${pojoName}s
+	 * 
+	 * @param model
+	 * @param ${pojoName}
+	 *            信息
+	 */
+	@PostMapping
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> doCreate(@Valid ${pojoName}Form form) {
+
+		${pojoName} ${pojoNameLower} = new ${pojoName}();
+		BeanUtils.copyProperties(form, ${pojoNameLower});
+		setCreateInfo(${pojoNameLower});
+		repository.save(${pojoNameLower});
+		updateWarpVO(WARP_VO_CACHE_NAME);
+		Map<String, Object> map = getSucceed();
+		return map;
+	}
+
+	/**
+	 * 修改信息，增量修改信息，如果有全量修改的需求，请使用PUT请求 PATCH /:id
+	 * 
+	 * @param model
+	 * @param id
+	 *            用户ID
+	 * @param ${pojoName}
+	 *            修改后的信息
+	 */
+	@PatchMapping("/{id}")
+	@Transactional(rollbackFor = Exception.class)
+	public Map<String, Object> doUpdate(@PathVariable String id, @Valid ${pojoName}Form form) {
+		${pojoName} ${pojoNameLower} = repository.findById(id);
+		if (null == ${pojoNameLower}) {
+			throw new EbootException(CommonErrorCode.DATA_SELECT_FAIL);
+		}
+		// 增量修改信息
+		copyProperties(form, ${pojoNameLower});
+		setModifyInfo(${pojoNameLower});
+		repository.updateById(${pojoNameLower});
+		updateWarpVO(WARP_VO_CACHE_NAME);
+		Map<String, Object> map = getSucceed();
+		return map;
+	}
+
+	@Override
+	protected List<String> putDbControlField() {
+		List<String> list = new ArrayList<String>();
+		list.add("amount");
+#foreach ($op in ${ops})
+#if (${op.exists}) 
+        list.add("${op.name}");
+#end
+#end
+		return list;
+	}
+
+	@Override
+	@SuppressWarnings({ "rawtypes" })
+	protected List<${pojoName}> convertExceData(List<Map> data, List<${pojoName}> list) {
+		return super.convertExceData(data, list);
+	}
+
+	@Override
+	protected String getExportFileName(${pojoName}Form form) {
+		return super.getExportFileName(form);
+	}
+
+	@Override
+	protected String assembleExcelObj(ExcelObject<${pojoName}VO> eo) {
+		return super.assembleExcelObj(eo);
+	}
+
+	@Override
+	protected Class<${pojoName}VO> getVoClass() {
+		return ${pojoName}VO.class;
+	}
+
+	@Override
+	protected BaseVO creactVO() {
+		return new ${pojoName}VO();
+	}
+
+	@Override
+	protected String getIdVale(${pojoName} m) {
+		return m.get${key.upName}() + "";
+	}
+
+	@Override
+	protected String getIdFieldName() {
+		return "${key.name}";
+	}
+
+	@Override
+	protected BaseSearcher getCreactBaseSearcher() {
+		return new ${pojoName}SearchContext();
+	}
+
+	@Override
+	protected String getWarpCacheName() {
+		return WARP_VO_CACHE_NAME;
+	}
+
+}

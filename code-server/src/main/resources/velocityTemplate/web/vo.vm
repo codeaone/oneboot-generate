@@ -1,0 +1,51 @@
+package ${basepackage}.controller.${modelName};
+
+import java.util.Date;
+import com.codeaone.boot.mvc.format.SimpleDateTimeJsonSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.codeaone.boot.mvc.base.BaseVO;
+
+import lombok.Getter;
+import lombok.Setter;
+
+#foreach ($op in ${ops})
+#if (${op.enums})
+import ${op.enumName};
+#end
+#end
+
+/**
+ * 查詢列表返回內容
+ * @author tushiqiao
+ * @version $Id: ${pojoName}VO.java, v 0.1 2016年8月27日 下午1:15:11 tushiqiao Exp $
+ */
+@Setter
+@Getter
+public class ${pojoName}VO extends BaseVO {
+
+#foreach ($op in ${ops})
+#if (${op.listView})
+		
+	/** ${op.desc}  ${op.enumLink}*/
+#if(${op.type} == "Date")
+	@JsonSerialize(using = SimpleDateTimeJsonSerializer.class)
+#end
+	private ${op.type}            ${op.name};
+#if (${op.mappingData})
+	private ${op.type}            ${op.mappingDataNameField};
+#end
+#end
+#end
+	/** 操作时间 */
+	@JsonSerialize(using = SimpleDateTimeJsonSerializer.class)
+	private Date gmtModified;
+
+#foreach ($op in ${ops})
+#if (${op.enums})
+    public String get${op.upName}Name() {
+        return ${op.enumSimpleName}.getNameByCode(${op.name}#if("Integer"==${op.type})+""#end);
+    }
+    
+#end
+#end
+}

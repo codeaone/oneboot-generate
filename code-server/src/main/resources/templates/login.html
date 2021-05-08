@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title th:text="${SYS_TITLE }"/>
+<link rel="stylesheet" type="text/css" href="./dist/login/css/mediaCom.css" />
+<link rel="stylesheet" type="text/css" href="./dist/login/css/mediaLogin.css?v=6" />
+
+<script type="text/javascript">
+	window.path = '${path}' + '/';
+</script>
+</head>
+<body>
+
+	<body onload="document.f.username.focus();">
+	<form name="f" action="./login" method="POST">
+		<div class="media-login-wrap">
+			<p class="login-title" th:text="${SYS_TITLE }"></p>
+			<p class="login-error" th:if="${param.error}" th:text="${session.SPRING_SECURITY_LAST_EXCEPTION.message}"></p>
+			
+			<div class="form-outer">
+				<div class="form-item">
+					<span>
+						<img src="./dist/login/images/name-icon.png?v=1" alt="" />
+					</span>
+					<input class="ui-input-nomal" name="username" type="text" placeholder="请输入用户名/手机号" />
+				</div>
+				<p class="show-form-message"></p>
+			</div>
+			<div class="form-outer">
+				<div class="form-item">
+					<span>
+						<img src="./dist/login/images/lock-icon.png?v=1" alt="" />
+					</span>
+					<input class="ui-input-nomal" name="password" type="password" placeholder="请输入密码" />
+				</div>
+				<p class="show-form-message"></p>
+			</div>
+			<div class="form-outer">
+				<input id="remember-me" name="remember-me" type="checkbox"/>下次自动登录
+				<p class="show-form-message"></p>
+			</div>
+			<!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/> -->
+			<input class="submit-active-btn" name="submit" type="submit" value="登录"/>
+		</div>
+		</form>
+	</body>
+
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+package ${basepackage}.common.facade.result;
+
+import com.codeaone.boot.core.result.CommonMngResult;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+#if(${isExistDateType})
+import java.util.Date;
+#end
+
+import ${basepackage}.common.facade.model.${pojoName}DTO;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * 查詢列表返回內容
+ * @author tushiqiao 
+ * @version $Id: ${pojoName}VO.java
+ */
+@Setter
+@Getter
+public class ${pojoName}Result extends CommonMngResult<${pojoName}DTO> {
+
+	/** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+    
+    /** id */
+    private ${key.type}             id;
+
+#foreach ($op in ${ops})
+#if (${op.listView})
+		
+	/** ${op.desc} ${op.enumLink} */
+	private ${op.type}            ${op.name};
+#end
+#end
+
+
+
+   
+}

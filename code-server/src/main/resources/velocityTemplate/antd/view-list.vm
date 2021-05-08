@@ -1,0 +1,84 @@
+import React, { useEffect } from 'react';
+import { FormItemX, TableX, FormSearch, CommonToolbar } from '@/common';
+
+const editModal = [
+#foreach ($op in ${ops})
+#if (${op.addOrUpdate})
+#if(${op.add} && !${op.update}) {isCreated? #elseif(!${op.add} && ${op.update}) {!isCreated? #end
+#if(${op.otype} == "checkbox")
+  <FormItemX label="${op.desc}" name="${op.name}" type="checkboxx"#if (${op.required}) required#end#if (${op.ruleType}) ruleType=${op.ruleTypeFormat}#end #if (${op.modifyDisabled}) modifyDisabled={true}#end#if (${op.modifyText}) modifyText={true}#end#if (!${op.modifyDisplay}) modifyDisplay={false}#end#if (${op.exists}) exists#end />,
+#elseif(${op.inputType} == "rangepicker")
+  <FormItemX label="${op.desc}" name="${op.name}" type="rangepickerx" start="dateStart" end="dateEnd"#if (${op.required}) required#end#if (${op.ruleType}) ruleType=${op.ruleTypeFormat}#end #if (${op.modifyDisabled}) modifyDisabled={true}#end#if (${op.modifyText}) modifyText={true}#end#if (!${op.modifyDisplay}) modifyDisplay={false}#end#if (${op.exists}) exists#end />,
+#elseif(${op.inputType} == "select")
+  <FormItemX label="${op.desc}" name="${op.name}" type="selectx"#if (${op.required}) required#end#if (${op.ruleType}) ruleType=${op.ruleTypeFormat}#end#if (${op.modifyDisabled}) modifyDisabled={true}#end#if (${op.modifyText}) modifyText={true}#end#if (!${op.modifyDisplay}) modifyDisplay={false}#end#if (${op.exists}) exists#end />,
+#else
+  <FormItemX label="${op.desc}" name="${op.name}" type="${op.inputType}"#if (${op.required}) required#end#if (${op.ruleType}) ruleType=${op.ruleTypeFormat}#end#if (${op.modifyDisabled}) modifyDisabled={true}#end#if (${op.modifyText}) modifyText={true}#end#if (!${op.modifyDisplay}) modifyDisplay={false}#end#if (${op.exists}) exists#end />,
+#end
+#if(${op.add} && !${op.update}) :null} #elseif(!${op.add} && ${op.update}) :null}
+#end
+#end
+#end
+];
+
+const modalTitle = '${remark}';
+const useName = '${antdName}';
+
+const ${antdName}List = props => {
+  useEffect(() => {
+    const { dispatch } = props;
+    dispatch({ type: '${antdUpName}s/query' });
+  }, []);
+
+  const columns = [
+#foreach ($op in ${ops})
+#if (${op.listView})
+    {title: '${op.desc}',#if (${op.enums})dataIndex: '${op.name}Name',#else dataIndex: '${op.name}',#end key: '${op.name}'},
+#end
+#end
+  ];
+
+  const toolbarProps = {
+    isAdd: true,
+    isEdit: true,
+    isImport: false,
+    isDelete: true,
+    isExport: true,
+    useName,
+    modalTitle,
+    editModal,
+    //importModal,
+    //improtCheckColumns,
+  };
+
+  return (
+    <>
+      <div className={'_normal'}>
+        <div className={'_create'}>
+          <CommonToolbar {...props} {...toolbarProps} />
+        </div>
+        <div className={'_search'}>
+          <FormSearch {...props} useName={`${useName}List`}>
+#foreach ($op in ${ops})
+#if (${op.searcher})
+#if(${op.otype} == "checkbox")
+            <FormItemX label="${op.desc}" name="${op.name}" type="checkboxx"  />
+#elseif(${op.inputType} == "rangepicker")
+            <FormItemX label="${op.desc}" name="${op.name}" type="rangepickerx" start="dateStart" end="dateEnd"  />
+#elseif(${op.inputType} == "select")
+            <FormItemX label="${op.desc}" name="${op.name}" type="selectx" />
+#else
+            <FormItemX label="${op.desc}" #if(${op.searcherLike}) name="${op.name}Like" #else name="${op.name}"　#end  type="${op.inputType}"  />
+#end
+#end
+#end
+          </FormSearch>
+        </div>
+      </div>
+      <div>
+        <TableX {...props} useName={`${useName}List`} columns={columns} shwoRows />
+      </div>
+    </>
+  );
+};
+
+export default ${antdName}List;

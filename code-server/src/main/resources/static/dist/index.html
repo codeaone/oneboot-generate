@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="keywords"
+      content="antd,umi,umijs,ant design,脚手架,布局, Ant Design,项目,Pro,admin,控制台,主页,开箱即用,中后台,解决方案,组件库"
+    />
+    <meta
+      name="description"
+      content="An out-of-box UI solution for enterprise applications as a React boilerplate."
+    />
+    <meta name="description" content="开箱即用的中台前端/设计解决方案。" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <title>OneBoot-PRO</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon" />
+    <script
+      type="text/javascript"
+      src="http://api.map.baidu.com/api?v=3.0&ak=cQIR7UpN2SuoTeRX44ecs0IvDRGus3wG"
+    ></script>
+    <script src="http://passport.cnblogs.com/scripts/jsencrypt.min.js"></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      media="all"
+      href="/static/home_load.css"
+    />
+    <!-- 百度地图3.0 离线API Begin -->
+    <!-- <script type="text/javascript" src="http://127.0.0.1:8080/dist/bmap-offline/map3.0_init.js"></script>
+    <script type="text/javascript" src="http://127.0.0.1:8080/dist/bmap-offline/map3.0.js"></script> -->
+    <!-- 百度地图3.0 End -->
+
+    <script>
+      window.isDev = true;
+      //  window.path = 'http://test.masteryu.site/sptrade/'; //
+      //  window.path = 'http://127.0.0.1:8080/dongtou/'; //
+      window.path = "http://127.0.0.1:8082"; //
+      // window.path = 'https://yq.xsvip.com/'; //
+      // window.path = ''; //
+      window.passwordEncrypt = true;
+      window.isDev = true;
+      //登录用户信息
+      window.user = {
+        userType: "1",
+        username: "admin",
+      };
+
+      window.menus = [];
+    </script>
+    <link rel="stylesheet" href="/umi.css" />
+    <script>
+      window.routerBase = "/";
+    </script>
+    <script>
+      //! umi version: 3.3.3
+    </script>
+  </head>
+  <body>
+    <noscript>Out-of-the-box mid-stage front/design solution!</noscript>
+    <div id="root">
+      <style></style>
+      <div
+        style="
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column;
+          min-height: 420px;
+          height: 100%;
+        "
+      >
+        <img src="/static/home_logo.png" alt="logo" width="256" />
+        <div class="page-loading-warp">
+          <div class="ant-spin ant-spin-lg ant-spin-spinning">
+            <span class="ant-spin-dot ant-spin-dot-spin"
+              ><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i
+              ><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i
+            ></span>
+          </div>
+        </div>
+        <div
+          style="display: flex; justify-content: center; align-items: center"
+        >
+          OneBoot-PRO
+        </div>
+      </div>
+    </div>
+
+    <script src="/umi.js"></script>
+  </body>
+</html>

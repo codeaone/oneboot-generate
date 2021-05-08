@@ -1,0 +1,32 @@
+package ${basepackage}.model.models;
+
+#foreach ($p in ${importPackages})
+import ${p};
+#end
+
+import com.codeaone.boot.mybatis.extend.FieldExtMap;
+import com.codeaone.boot.mybatis.base.BaseModel;
+
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * ${table.remark}
+ *
+ * @author tushiqiao
+ * @version $Id: ${table.name}.java, v 0.1  Exp $
+ */
+@Setter
+@Getter
+@FieldExtMap
+public class ${table.name} extends BaseModel {
+
+	/** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+#foreach ($op in ${table.modelColumns})
+		
+	/** ${op.remarks} */
+	private ${op.javaShortType} ${op.name};
+#end
+
+}

@@ -1,0 +1,44 @@
+package ${basepackage}.repository.domain;
+
+import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import com.codeaone.boot.core.logging.ToString;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * ${table.remark}
+ *
+ * @author tushiqiao
+ * @version $Id: ${table.name}.java, v 0.1  Exp $
+ */
+@Setter
+@Getter
+@TableName("${tableName}")
+public class ${table.name}DO extends ToString {
+
+	/** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+#foreach ($op in ${table.primaryKeyColumns})
+	/** ${op.remarks} */
+#if(${key.autoIncrement})
+	@TableId(type = IdType.AUTO)
+#end
+	private ${op.javaShortType} ${op.name};
+#end
+
+#foreach ($op in ${table.baseColumns})
+		
+	/** ${op.remarks} */
+	private ${op.javaShortType} ${op.name};
+#end
+
+#if(${subTable})
+    /** 分表后缀  */
+    private String tableSuffix;
+#end
+}

@@ -1,0 +1,116 @@
+import * as service from './service';
+import { filterQueryData } from '@/common';
+
+export default {
+  namespace: '${antdUpName}s',
+
+  state: {
+    list: [],
+    loading: false,
+    newData: {},
+    currentItem: {},
+    editData: {},
+    searchItem: {},
+    selectedRows: [],
+    modalVisible: false,
+    pagination: {},
+    modalType: 'create',
+  },
+  //订阅事件
+  subscriptions: {
+    setup({ dispatch, history }) {
+      return history.listen(({ pathname, query }) => {
+        //只要路径是 /${antdUpName}s/ 那么我们就会发起 action，获取用户数据
+        if (pathname === '/${antdUpName}s') {
+          dispatch({ type: 'query', payload: query });
+        }
+      });
+    },
+  },
+  //Effects 简单理解成异步操作   简单理解成 Reducers 处理同步
+  //Effects 主要是 控制数据流程 ，所以最终往往我们在 Effects 中会调用 Reducers
+  effects: {
+    *query({ payload }, { select, call, put }) {
+      //call 和 put 是 dva 提供的方便操作 effects 的函数
+      //简单理解 call 是调用执行一个函数而 put 则是相当于 dispatch 执行一个 action
+      //而 select 则可以用来访问其它 model
+      const newQuery = filterQueryData(payload);
+
+      const data = yield call(service.query, newQuery);
+      const newData = yield call(service.donew, payload);
+      if (data && data.success) {
+        //如果data不为空，执行querySuccess 方法更新state
+        const p = {
+          total: data.data.totalCount,
+          current: data.data.pageNo,
+          pageSize: data.data.pageSize,
+        };
+        yield put({
+          type: 'setState',
+          payload: {
+            list: data.data.result,
+            pagination: p,
+            newData: newData,
+            searchItem: newQuery,
+            selectedRows: []
+          },
+        });
+      } else {
+        yield put({ type: 'hideLoading' });
+      }
+    },
+    *dosetstate({ payload }, { call, put }) {
+      yield put({
+        type: 'setState',
+        payload: payload,
+      });
+    },
+    *donew({ payload }, { call, put }) {
+      const data = yield call(service.donew, payload);
+      if (data && data.success) {
+        yield put({
+          type: 'setState',
+          payload: {
+            newData: data || {},
+            modalType: 'create',
+          },
+        });
+      }
+    },
+    *doshow({ payload }, { call, put }) {
+      const data = yield call(service.show, payload);
+      if (data && data.success) {
+        yield put({
+          type: 'setState',
+          payload: {
+            editData: data.data,
+            modalType: 'show',
+          },
+        });
+      }
+    },
+    *doedit({ payload }, { call, put }) {
+      const data = yield call(service.edit, payload);
+      if (data && data.success) {
+        yield put({
+          type: 'setState',
+          payload: {
+            editData: data.data,
+            modalType: 'update',
+          },
+        });
+      }
+    },
+  },
+  //Reducers 的本质是修改 model 的 state
+  reducers: {
+    // 如果有一些需要业务处理的，请放在此处进行
+    //更新状态
+    setState(state, action) {
+      return {
+        ...state,
+        ...action.payload,
+      };
+    },
+  },
+};

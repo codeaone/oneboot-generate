@@ -1,0 +1,353 @@
+package ${basepackage}.controller.${modelName};
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
+
+#foreach ($p in ${importPackages})
+import ${p};
+#end
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.codeaone.boot.core.context.ServiceContextHolder;
+import com.codeaone.boot.core.exception.EbootException;
+import com.codeaone.boot.core.lang.Page;
+import com.codeaone.boot.core.logging.LoggerUtil;
+import com.codeaone.boot.core.logging.digest.annotations.DigestLogName;
+import com.codeaone.boot.mvc.file.ExcelObject;
+import com.codeaone.boot.mvc.file.XlsxExcelView;
+import ${basepackage}.common.facade.${pojoName}Facade;
+import ${basepackage}.common.facade.model.${pojoName}DTO;
+import ${basepackage}.common.facade.request.${pojoName}Request;
+
+import com.huanwu.sp.spmodel.enums.CommonResultCode;
+import com.huanwu.sp.spcore.controller.BaseController;
+
+/**
+ * 
+ * @author tushiqiao
+ * @version $Id: ${pojoName}ControllerF.java, v 0.1 2016年8月27日 下午12:33:42 tushiqiao Exp $
+ */
+@Controller
+@ResponseBody
+@DigestLogName("${modelName}s")
+public class ${pojoName}Controller extends BaseController {
+    @Autowired
+    private ${pojoName}Facade    ${pojoNameLower}Facade;
+
+    private final static String warpVOCacheName = "${pojoNameLower}";
+
+    /**
+     * 获取列表信息列表
+     * GET  /${pojoNameLower}s
+     * 
+     * @param model
+     * @param request
+     */
+    @GetMapping("/${modelName}s")
+    public Map<String, Object> doIndex(${pojoName}Form form) {
+        Map<String, Object> map = getSucceed();
+        map.put("data", getSearchData(form));
+        return map;
+    }
+
+    /**
+     * 获取分页查询数据
+     * @param form
+     * @return
+     */
+    private Page<${pojoName}VO> getSearchData(${pojoName}Form form) {
+        ${pojoName}Request ${pojoNameLower} = new ${pojoName}Request();
+        BeanUtils.copyProperties(form, ${pojoNameLower});
+        //分页查询数据
+        Page<${pojoName}DTO> pageList = ${pojoNameLower}Facade.searchPage(${pojoNameLower}).getPageList();
+        //此处ID是需要返回到页面的字段，请根据实际情况处理
+        return copyToPage(pageList, ${pojoName}VO.class, "id");
+    }
+
+    /**
+     * 检查字段值是否已存在
+     * GET /${modelName}s/exists
+     * @param fieldName 字段名
+     * @param value  字段值
+     * @return
+     */
+    @GetMapping("/${modelName}s/exists")
+    public Map<String, Object> doExists(String fieldName, String value) {
+        Map<String, Object> map = getSucceed();
+        List<String> canFieldName = new ArrayList<>();
+        // 此处一定要对字段进行管控
+        canFieldName.add("name");
+        canFieldName.add("age");
+
+        // 如果不在上面的列表中，直接报错
+        if (!canFieldName.contains(fieldName)) {
+            throw new EbootException(CommonResultCode.DATA_CHCEK_FAIL);
+        }
+
+        ${pojoName}Request req = new ${pojoName}Request();
+        req.setField(fieldName);
+        req.setValue(value);
+
+        map.put("exist", ${pojoNameLower}Facade.exists(req).isExist());
+        return map;
+    }
+
+    /**
+     * 获取新建信息初始数据
+     * GET /${modelName}s/new
+     * 
+     * @param model
+     */
+    @GetMapping("/${modelName}s/new")
+    public Map<String, Object> doNew() {
+        Map<String, Object> map = getSucceed();
+        return map;
+    }
+
+    /* 
+     * 数据转换请在这里操作
+     */
+    @Override
+    protected void warpTheVO(Object source, Object vo) {
+        // 可以进行内容转换 缓存
+
+        ${pojoName}VO eVO = (${pojoName}VO) vo;
+
+    }
+
+    /**
+     * 新建信息
+     * POST /${modelName}s
+     * 
+     * @param model
+     * @param ${pojoNameLower} 信息
+     */
+    @PostMapping("/${modelName}s")
+    @Transactional
+    public Map<String, Object> doCreate(@Valid ${pojoName}Form form, BindingResult result) {
+        //表单校验
+        if (result.hasErrors()) {
+            return resultIllegalFailed(result);
+        }
+
+        ${pojoName}Request ${pojoNameLower} = new ${pojoName}Request();
+        BeanUtils.copyProperties(form, ${pojoNameLower});
+        setCreateInfo(${pojoNameLower});
+        ${pojoNameLower}Facade.insert${pojoName}(${pojoNameLower});
+        updateWarpVO(warpVOCacheName);
+        Map<String, Object> map = getSucceed();
+        return map;
+    }
+
+    /**
+     * 显示信息
+     * GET /${modelName}s/:id
+     * 
+     * @param model
+     * @param id ID
+     * @return
+     */
+    @GetMapping("/${modelName}s/{id}")
+    public Map<String, Object> doShow(@PathVariable String id) {
+        Map<String, Object> map = getSucceed();
+        ${pojoName}Request req = new ${pojoName}Request();
+        req.setId(id);
+        ${pojoName}DTO ${pojoNameLower} = ${pojoNameLower}Facade.findByID(req).getData();
+        if (null == ${pojoNameLower}) {
+            throw new EbootException(CommonResultCode.DATA_SELECT_FAIL);
+        }
+        ${pojoName}VO vo = new ${pojoName}VO();
+        BeanUtils.copyProperties(${pojoNameLower}, vo);
+        vo.setId(${pojoNameLower}.getId());
+        map.put("data", vo);
+
+        return map;
+    }
+
+    /**
+     * 获取需要修改的信息
+     * GET /${modelName}s/:id/edit
+     * 
+     * @param model
+     * @param id ID
+     */
+    @GetMapping("/${modelName}s/{id}/edit")
+    public Map<String, Object> doEdit(@PathVariable String id) {
+        ${pojoName}Request req = new ${pojoName}Request();
+        req.setId(id);
+        ${pojoName}DTO ${pojoNameLower} = ${pojoNameLower}Facade.findByID(req).getData();
+        if (null == ${pojoNameLower}) {
+            throw new EbootException(CommonResultCode.DATA_SELECT_FAIL);
+        }
+        ${pojoName}VO vo = new ${pojoName}VO();
+        BeanUtils.copyProperties(${pojoNameLower}, vo);
+        vo.setId(${pojoNameLower}.getId());
+        Map<String, Object> map = getSucceed();
+        map.put("data", vo);
+        return map;
+    }
+
+    /**
+     * 修改信息，增量修改信息，如果有全量修改的需求，请使用PUT请求
+     * PATCH  /${modelName}s/:id
+     * 
+     * @param model
+     * @param id 用户ID
+     * @param ${pojoNameLower} 修改后的信息
+     */
+    @PatchMapping("/${modelName}s/{id}")
+    @Transactional
+    public Map<String, Object> doUpdate(@PathVariable String id, @Valid ${pojoName}Form form,
+                                        BindingResult result) {
+        //表单校验
+        if (result.hasErrors()) {
+            return resultIllegalFailed(result);
+        }
+        ${pojoName}Request req = new ${pojoName}Request();
+        req.setId(id);
+        ${pojoName}DTO ${pojoNameLower} = ${pojoNameLower}Facade.findByID(req).getData();
+        if (null == ${pojoNameLower}) {
+            throw new EbootException(CommonResultCode.DATA_SELECT_FAIL);
+        }
+        //增量修改信息
+        copyProperties(form, req);
+        setModifyInfo(${pojoNameLower});
+        ${pojoNameLower}Facade.update${pojoName}(req);
+        updateWarpVO(warpVOCacheName);
+        Map<String, Object> map = getSucceed();
+        return map;
+    }
+
+    /**
+     * 批量修改字段的信息，form.field 由前端传入
+     * PATCH  /flowsupplys/:id
+     * @param id
+     * @param form
+     * @param result
+     * @return
+     */
+    @PatchMapping("/${modelName}s/{id}/batch")
+    @Transactional
+    public Map<String, Object> doUpdateBatch(@PathVariable String id, @Valid ${pojoName}Form form,
+                                             BindingResult result) {
+        //表单校验
+        if (result.hasErrors()) {
+            return resultIllegalFailed(result);
+        }
+        List<String> canFieldName = new ArrayList<>();
+        // 此处一定要对字段进行管控
+        canFieldName.add("amount");
+        canFieldName.add("price");
+
+        // 如果不在上面的列表中，直接报错
+        if (!canFieldName.contains(form.getField())) {
+            throw new EbootException(CommonResultCode.DATA_CHCEK_FAIL);
+        }
+
+        //判断对id进行截取逗号分开，放到一个list里面，判断这个list 长度 大于0进行批量操作
+        String[] sourceStrArray = id.split(",");
+        if (sourceStrArray.length > 0) {
+            List<String> list = Arrays.asList(sourceStrArray);
+            // 通过多个ID，进行批量修改 
+            ${pojoName}Request req = new ${pojoName}Request();
+            copyProperties(form, req);
+            req.setId(id);
+            req.setIdList(list);
+            ${pojoNameLower}Facade.updateBatchField(req);
+        }
+
+        updateWarpVO(warpVOCacheName);
+        Map<String, Object> map = getSucceed();
+        return map;
+    }
+
+    /**
+     * 删除
+     * DELETE  /${modelName}s/:id
+     * 
+     * @param model
+     * @param id ID
+     */
+    @DeleteMapping("/${modelName}s/{id}")
+    @Transactional
+    public Map<String, Object> doDestroy(@PathVariable String id) {
+        ${pojoName}Request req = new ${pojoName}Request();
+        req.setId(id);
+        ${pojoName}DTO ${pojoNameLower} = ${pojoNameLower}Facade.findByID(req).getData();
+        if (null == ${pojoNameLower}) {
+            throw new EbootException(CommonResultCode.DATA_SELECT_FAIL);
+        }
+        ${pojoNameLower}Facade.delete${pojoName}(req);
+        updateWarpVO(warpVOCacheName);
+        Map<String, Object> map = getSucceed();
+        return map;
+    }
+
+    /**
+     * 文件导出
+     * @param form
+     * @return
+     */
+    @GetMapping(value = "/${modelName}s/export")
+    public ModelAndView doExport(${pojoName}Form form) {
+
+        // 参数 MAP
+        Map<String, Object> dataMap = new HashMap<String, Object>();
+        //在这里增加需要导出的字段
+        ExcelObject<${pojoName}VO> eo = new ExcelObject<${pojoName}VO>("每日报表");
+        eo.addTitle("orderNumber", "订单总数");
+        eo.addTitle("reportDate", "结算时间");
+        eo.addTitle("settleFund", "结算资金（元）");
+        eo.addTitle("orderTotalFund", "订单总金额（元）");
+        eo.addTitle("cpNo", "CP标识");
+        //去DB里查询数据，注意，条件要与doIndex里保持一致
+        eo.setDatas(getListAll(form));
+        dataMap.put("ExcelObject", eo);
+        //增加日期格式，注意目前只支持一种格式
+        XlsxExcelView view = new XlsxExcelView();
+        view.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+
+        ModelAndView mv = new ModelAndView(view, dataMap);
+        return mv;
+    }
+
+    private List<${pojoName}VO> getListAll(${pojoName}Form form) {
+        List<${pojoName}VO> list = new ArrayList<>();
+        ServiceContextHolder.setOffSet(1);
+        ServiceContextHolder.setPageSize(1000);
+        //得到总页数据，然后for查询
+        //分页查询数据
+        Page<${pojoName}VO> pageList = getSearchData(form);
+        LoggerUtil.info("查询总数：{0}", pageList.getTotalCount());
+
+        list.addAll(pageList.getResult());
+        int totalPageSize = pageList.getTotalPageSize();
+
+        for (int i = 2; i <= totalPageSize; i++) {
+            ServiceContextHolder.setOffSet(i);
+            pageList = getSearchData(form);
+            list.addAll(pageList.getResult());
+        }
+
+        return list;
+    }
+
+}

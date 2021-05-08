@@ -1,0 +1,116 @@
+package ${basepackage}.localcache;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import com.codeaone.boot.cache.CacheMessageUtil;
+import com.codeaone.boot.core.exception.AssertUtil;
+import ${basepackage}.model.enums.CommonResultCode;
+import ${basepackage}.model.models.${pojoName};
+
+/**
+ * 
+ * @author auto general
+ * @version $Id: ${pojoName}Cache.java
+ */
+public class ${pojoName}Cache {
+
+	/** 缓存：key: appId */
+	private static final Map<String, ${pojoName}> cache = new HashMap<String, ${pojoName}>();
+
+	/** 读写锁 */
+	private static final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+	/**
+	 * 禁用构造函数
+	 */
+	private ${pojoName}Cache() {
+		// 禁用构造函数
+	}
+
+	/**
+	 * 刷新部分缓存，和刷新全部的区别是不进行清理
+	 * 
+	 * @param params
+	 */
+	public static void putParts(List<${pojoName}> apps) {
+
+		Lock writelock = lock.writeLock();
+		writelock.lock();
+		try {
+			updateCache(apps);
+		} finally {
+			writelock.unlock();
+		}
+	}
+
+	/**
+	 * 刷新缓存
+	 * 
+	 * @param params
+	 */
+	public static void putAll(List<${pojoName}> list) {
+		Lock writelock = lock.writeLock();
+		writelock.lock();
+		try {
+			cache.clear();
+			updateCache(list);
+		} finally {
+			writelock.unlock();
+		}
+	}
+
+	public static ${pojoName} get(String id) {
+		Lock readlock = lock.readLock();
+		readlock.lock();
+		try {
+			return cache.get(id);
+		} finally {
+			readlock.unlock();
+		}
+	}
+
+	/**
+	 * 根据参数名称获取值，主要在组装报文中使用<br>
+	 * 强制检查，没有配置，会抛出异常
+	 * 
+	 * @param appId
+	 * @param paramType
+	 * @param paramName
+	 * @return
+	 */
+	public static ${pojoName} getValueByID(String id) {
+
+		AssertUtil.isNotNull(id, CommonResultCode.ILLEGAL_PARAMETERS);
+
+		Lock readlock = lock.readLock();
+		readlock.lock();
+		try {
+			return cache.get(id);
+		} finally {
+			readlock.unlock();
+		}
+	}
+
+	/**
+	 * 获取报文参数描述
+	 * 
+	 * @return
+	 */
+	public static String getCacheInfo() {
+		return CacheMessageUtil.mapStringAndObject(cache).toString();
+	}
+
+	/**
+	 * 更新缓存
+	 */
+	private static void updateCache(List<${pojoName}> list) {
+		for (${pojoName} obj : list) {
+			cache.put(obj.get${key.upName}()+"", obj);
+		}
+	}
+}

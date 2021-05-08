@@ -1,0 +1,51 @@
+package ${basepackage}.repository.searcher;
+
+#foreach ($p in ${importPackages})
+import ${p};
+#end
+
+import com.codeaone.boot.mybatis.model.BaseTotalSearcher;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * ${pojoNameLower} 分页查询类
+ *
+ * @author tushiqiao
+ * @version $Id: ${pojoName}SearchContext.java, v 0.1  Exp $
+ */
+@Setter
+@Getter
+public class ${pojoName}SearchContext extends BaseTotalSearcher{
+    /** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+
+
+#foreach ($op in ${ops})
+#if (${op.searcher})
+#if(${op.searcherLike})
+    /** ${op.desc}  */
+    private ${op.type} ${op.name}Like;
+#end
+
+#if(${op.otype} == "date_start_end")
+    /** ${op.desc} Start 开始 */
+    private ${op.type} ${op.name}Start;
+
+    /** ${op.desc} End 结束 */
+    private ${op.type} ${op.name}End;
+    
+#else
+    /** ${op.desc}  */
+    private ${op.type} ${op.name};
+#end
+#end
+#end
+
+#if(${subTable})
+    /** 分表后缀  */
+    private String tableSuffix;
+#end
+
+
+}

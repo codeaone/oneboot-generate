@@ -1,0 +1,348 @@
+package ${basepackage}.service.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.codeaone.boot.core.exception.EbootException;
+import com.codeaone.boot.core.lang.Page;
+import com.codeaone.boot.core.template.CommonOperateCallback;
+import ${basepackage}.repository.searcher.${pojoName}SearchContext;
+import ${basepackage}.common.facade.${pojoName}Facade;
+import ${basepackage}.common.facade.model.${pojoName}DTO;
+import ${basepackage}.common.facade.request.${pojoName}Request;
+import ${basepackage}.common.facade.result.${pojoName}Result;
+import ${basepackage}.model.enums.CommonResultCode;
+import ${basepackage}.model.enums.SceneCodeEnum;
+import ${basepackage}.model.models.${pojoName};
+import ${basepackage}.repository.${pojoName}Repository;
+
+#foreach ($p in ${importPackages})
+import ${p};
+#end
+
+/**
+ * ${pojoNameLower} 组件操作类
+ * @author tushiqiao
+ * @version $Id: ${pojoName}FacadeImpl.java, v 0.1   Exp $
+ */
+@Service
+public class ${pojoName}FacadeImpl extends AbstractBaseFacade implements ${pojoName}Facade {
+    @Autowired
+    private ${pojoName}Repository  ${pojoNameLower}Repository;
+
+    /** 日志 */
+    private static final Logger LOGGER = LoggerFactory.getLogger("${pojoName}Facade");
+
+    @Override
+    public ${pojoName}Result insert${pojoName}(${pojoName}Request request) {
+        final String bizName = "insert${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //  此处需要检验手机号的合法性
+                    //　如果外显号不为空，需要检查外显示号码是否正确
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+
+                    ${pojoName} ${pojoNameLower} = new ${pojoName}();
+                    BeanUtils.copyProperties(request, ${pojoNameLower});
+                    ${pojoNameLower}Repository.insert${pojoName}(${pojoNameLower});
+
+                }
+
+            });
+    }
+
+    /* 
+     * 数据转换请在这里操作
+     */
+    @Override
+    protected void warpTheVO(Object source, Object vo) {
+        // 可以进行内容转换 缓存的问题需要集中处理好
+
+        /*Map<String, EnumObject> merchAllMap = warpTheVOService.getMap("merchant");
+        ${pojoName}VO eVO = (${pojoName}VO) vo;
+        EnumObject eo = merchAllMap.get(eVO.getMerchId());
+        if (eo != null) {
+            eVO.setMerchName(eo.getName());
+        }
+         */
+    }
+
+    /**
+     * 获取分页查询数据
+     * @param form
+     * @return
+     */
+    private Page<${pojoName}DTO> getSearchData(${pojoName}Request request) {
+        ${pojoName}SearchContext ${pojoNameLower} = new ${pojoName}SearchContext();
+        BeanUtils.copyProperties(request, ${pojoNameLower});
+#foreach ($op in ${ops})
+#if (${op.searcher})
+#if(${op.otype} == "date_start_end")
+        if (request.get${op.upName}End() != null) {
+            ${pojoNameLower}.set${op.upName}End(DateUtils.addDays(request.get${op.upName}End(), 1));
+        }
+#end
+#end
+#end
+        //分页查询数据
+        Page<${pojoName}> pageList = ${pojoNameLower}Repository.searchPage(${pojoNameLower});
+        //此处ID是需要返回到页面的字段，请根据实际情况处理
+        return copyToPage(pageList, ${pojoName}DTO.class, "id");
+    }
+
+    @Override
+    public ${pojoName}Result update${pojoName}(${pojoName}Request request) {
+        final String bizName = "update${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+                    ${pojoName} ${pojoNameLower} = ${pojoNameLower}Repository.findByID(request.getId());
+                    if (null == ${pojoNameLower}) {
+                        throw new EbootException(CommonResultCode.DATA_SELECT_FAIL);
+                    }
+                    //增量修改信息
+                    copyProperties(request, ${pojoNameLower});
+                    ${pojoNameLower}Repository.update${pojoName}(${pojoNameLower});
+
+                }
+
+            });
+    }
+
+    @Override
+    public ${pojoName}Result updateBatchField(${pojoName}Request request) {
+        final String bizName = "updateBatchField";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+
+                    List<String> canFieldName = new ArrayList<>();
+                    // 此处一定要对字段进行管控
+                    canFieldName.add("amount");
+                    canFieldName.add("price");
+
+                    // 如果不在上面的列表中，直接报错
+                    if (!canFieldName.contains(request.getField())) {
+                        throw new EbootException(CommonResultCode.DATA_CHCEK_FAIL);
+                    }
+                    Object value = request.getValue();
+                    // 需要对值进行控制 
+
+                    //判断对id进行截取逗号分开，放到一个list里面，判断这个list 长度 大于0进行批量操作
+                    int updateBatch = 0;
+
+                    // 通过多个ID，进行批量修改 
+                    updateBatch = ${pojoNameLower}Repository.updateBatchField(request.getIdList(),
+                        request.getField(), value);
+
+                    if (updateBatch == 0) {
+                        throw new EbootException(CommonResultCode.DATA_CHCEK_FAIL);
+                    }
+
+                }
+
+            });
+    }
+
+    @Override
+    public ${pojoName}Result delete${pojoName}(${pojoName}Request request) {
+        final String bizName = "insert${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+
+                    ${pojoName} ${pojoNameLower} = ${pojoNameLower}Repository.findByID(request.getId());
+                    if (null == ${pojoNameLower}) {
+                        throw new EbootException(CommonResultCode.DATA_SELECT_FAIL);
+                    }
+                    ${pojoNameLower}Repository.delete${pojoName}(request.getId());
+
+                }
+
+            });
+    }
+
+    @Override
+    public ${pojoName}Result findByID(${pojoName}Request request) {
+        final String bizName = "insert${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+
+                    ${pojoName} ${pojoNameLower} = ${pojoNameLower}Repository.findByID(request.getId());
+                    if (null == ${pojoNameLower}) {
+                        throw new EbootException(CommonResultCode.DATA_SELECT_FAIL);
+                    }
+                    ${pojoName}DTO dto = new ${pojoName}DTO();
+                    BeanUtils.copyProperties(${pojoNameLower}, dto);
+                    dto.setId(${pojoNameLower}.get${key.upName}());
+                    result.setData(dto);
+                }
+
+            });
+    }
+
+    @Override
+    public ${pojoName}Result findAll(${pojoName}Request request) {
+        final String bizName = "findAll${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+                    result.setList(
+                        copyPropertiesList(${pojoNameLower}Repository.findAll(), ${pojoName}DTO.class, "id"));
+
+                }
+
+            });
+    }
+
+    @Override
+    public ${pojoName}Result exists(${pojoName}Request request) {
+        final String bizName = "exists${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+                    List<String> canFieldName = new ArrayList<>();
+                    // 此处一定要对字段进行管控
+                    canFieldName.add("name");
+                    canFieldName.add("age");
+
+                    // 如果不在上面的列表中，直接报错
+                    if (!canFieldName.contains(request.getField())) {
+                        throw new EbootException(CommonResultCode.DATA_CHCEK_FAIL);
+                    }
+
+                    result.setExist(
+                        ${pojoNameLower}Repository.exists(request.getField(), request.getValue()));
+
+                }
+
+            });
+    }
+
+    @Override
+    public ${pojoName}Result searchPage(${pojoName}Request request) {
+        final String bizName = "searchPage${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+                    result.setPageList(getSearchData(request));
+
+                }
+
+            });
+    }
+
+    @Override
+    public ${pojoName}Result findToEnumList(${pojoName}Request request) {
+        final String bizName = "findToEnumList${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+                    result.setEnumList(${pojoNameLower}Repository.findToEnumList());
+
+                }
+
+            });
+    }
+
+    @Override
+    public ${pojoName}Result findToEnumMap(${pojoName}Request request) {
+        final String bizName = "findToEnumMap${pojoName}";
+        return operateTemplate.operate(LOGGER, bizName, SceneCodeEnum.BANKCARD_LIST,
+            ${pojoName}Result.class, new CommonOperateCallback<${pojoName}Result>() {
+
+                @Override
+                public void before() {
+                    //进行参数检查
+                    paramValidate.validate(request);
+                }
+
+                @Override
+                public void execute(${pojoName}Result result) {
+
+                    result.setEnumMap(${pojoNameLower}Repository.findToEnumMap());
+
+                }
+
+            });
+    }
+
+}

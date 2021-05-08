@@ -1,0 +1,57 @@
+package ${basepackage};
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import com.codeaone.boot.codegen.annotation.AntdColumn;
+import com.codeaone.boot.codegen.annotation.Operation;
+
+
+/**
+ * ${table.remark}
+ *
+ * @author tushiqiao
+ * @version $Id: ${table.name}.java, v 0.1  Exp $
+ */
+@Table(name = "${table.tableName}")
+public class ${table.name}{
+
+#foreach ($op in ${table.primaryKeyColumns})
+		
+	/** ${op.remarks} */
+	@Id
+#if (${op.autoIncrement})
+    @GeneratedValue
+#end
+	@Column(name = "${op.jdbcName}")
+	@Operation(desc="${op.remarks}")
+	private ${op.javaShortType} ${op.name};
+#end
+
+#foreach ($op in ${table.baseColumns})
+		
+	/** ${op.remarks} */
+	@Column(name = "${op.jdbcName}")
+	#if (${op.addOpt})
+	@Operation(desc="${op.remarks}", searcher=true, update=true, add=true, listView=true) 
+	@AntdColumn(desc="${op.remarks}", searcher=true, update=true, add=true, listView=true) 
+	#end private ${op.javaShortType} ${op.name};
+#end
+
+#foreach ($op in ${table.allColumns})
+	
+	public ${op.javaShortType} get${op.upName}() {
+        return ${op.name};
+    }
+
+    public void set${op.upName}(${op.javaShortType} ${op.name}) {
+        this.${op.name} = ${op.name};
+    }
+    
+#end
+
+}

@@ -1,0 +1,124 @@
+import React from 'react';
+import { connect } from 'dva';
+import { Card, message } from 'antd';
+import ${antdName} from './components/${antdName}List';
+import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import * as service from './service';
+
+function ${antdName}s({ dispatch, ${antdUpName}s }) {
+  const { list, newData, searchItem, editData, selectedRows, modalVisible, modalType, pagination } = ${antdUpName}s;
+
+  function handleAdd() {
+    dispatch({
+      type: '${antdUpName}s/donew',
+      payload: {
+        modalType: 'create',
+      },
+    });
+  }
+
+  function onShowItem(item) {
+    dispatch({
+      type: '${antdUpName}s/doshow',
+      payload: {
+        modalType: 'show',
+        currentItem: item,
+      },
+    });
+  }
+
+  function onEditItem(item) {
+    dispatch({
+      type: '${antdUpName}s/doedit',
+      payload: {
+        modalType: 'update',
+        currentItem: item,
+      },
+    });
+  }
+
+  function serviceCallbak(d) {
+    if (d && !d.success) {
+    } else {
+      message.success('操作成功');
+      onSelectRow([]);
+      dispatch({
+        type: '${antdUpName}s/query',
+        payload: searchItem,
+      });
+    }
+  }
+
+  function onDeleteItem(id) {
+    service.remove(id).then(this.serviceCallbak);
+  }
+  
+  function onSelectRow(selectedRowKeys) {
+    dispatch({
+      type: '${antdUpName}s/dosetstate',
+      payload: { selectedRows: selectedRowKeys },
+    });
+  }
+
+  function getQueryData(values) {
+    const querydata = {
+      ...searchItem,
+      ...values,
+      page: 1,
+      id: undefined,
+    };
+    return querydata;
+  }
+
+  const commonProps = {
+    modelName: '${antdUpName}s',
+    pathname: '/${antdUpName}s',
+    dispatch,
+    selectedRows,
+    newData,
+    searchItem,
+    serviceCallbak,
+    service,
+    handleAdd,
+    onShowItem,
+    onEditItem,
+  }
+
+  //Modal弹框的props属性
+  const modalProps = {
+    ...commonProps,
+    item: modalType === 'create' ? {} : editData,
+    type: modalType,
+    modalType,
+    editData,
+    visible: modalVisible,
+    formItem: modalType === 'create' ? {} : editData,
+  };
+
+  //查询的props属性
+  const searchProps = {
+    ...commonProps,
+    dataSource: list,
+    pagination,
+    modalProps,
+    onDeleteItem,
+    getQueryData,
+    onSelectRow
+  };
+
+  return (
+    <PageHeaderWrapper>
+      <Card bordered={false} className={'_context_card'}>
+        <${antdName} {...searchProps} />
+      </Card>
+    </PageHeaderWrapper>
+  );
+}
+
+// 监听属性，建立组件和数据的映射关系
+function mapStateToProps({ ${antdUpName}s }) {
+  return { ${antdUpName}s };
+}
+
+//关联 model
+export default connect(mapStateToProps)(${antdName}s);

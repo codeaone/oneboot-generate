@@ -1,0 +1,103 @@
+package ${basepackage}.model.enums;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.codeaone.boot.core.enums.IEnum;
+
+/**
+ * 性别枚举类
+ * 
+ * @author shiqiao.pro
+ * @see https://boot.codeaone.com
+ */
+public enum ${pojoName} implements IEnum {
+
+    /** 说明1 */
+    CODE1("1", "说明1"),
+    /** 说明2 */
+    CODE2("2", "说明2"),
+
+    ;
+
+    /** 代码 */
+    private final String code;
+
+    /** 名称 */
+    private final String name;
+
+    /** 描述 */
+    private final String description;
+
+    private ${pojoName}(String code, String name) {
+        this.code = code;
+        this.name = name;
+        this.description = name;
+    }
+
+    private ${pojoName}(String code, String name, String description) {
+        this.code = code;
+        this.name = name;
+        this.description = description;
+    }
+
+    /**
+     * 根据编码查询枚举。
+     * 
+     * @param code
+     *            编码。
+     * @return 枚举。
+     */
+    public static ${pojoName} getByCode(String code) {
+        for (${pojoName} value : ${pojoName}.values()) {
+            if (StringUtils.equals(code, value.getCode())) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 根据中文名称查询枚举。
+     * 
+     * @param name
+     *            中文名称。
+     * @return 枚举。
+     */
+    public static ${pojoName} getByName(String name) {
+        for (${pojoName} value : ${pojoName}.values()) {
+            if (StringUtils.equals(name, value.getName())) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param code
+     * @return
+     */
+    public static String getNameByCode(String code) {
+        ${pojoName} ee = getByCode(code);
+        if (ee != null) {
+            return ee.getName();
+        }
+        return code;
+    }
+
+    @Override
+    public String getCode() {
+        return this.code;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
+    @Override
+    public String getDescription() {
+        return this.description;
+    }
+
+}

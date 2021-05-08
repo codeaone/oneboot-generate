@@ -1,0 +1,43 @@
+package ${basepackage}.repository.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import ${basepackage}.repository.domain.${pojoName}DO;
+import ${basepackage}.repository.mapper.${pojoName}DAO;
+import ${basepackage}.model.models.${pojoName};
+import ${basepackage}.repository.${pojoName}Repository;
+
+import com.codeaone.boot.mybatis.base.BaseRepositoryImpl;
+
+/**
+ * ${pojoNameLower} 组件操作类
+ * 
+ * @author tushiqiao
+ * @version $Id: ${pojoName}RepositoryImpl.java, v 0.1 Exp $
+ */
+@Repository
+public class ${pojoName}RepositoryImpl extends BaseRepositoryImpl<${pojoName}, ${pojoName}DO>
+		implements ${pojoName}Repository {
+
+	@Autowired
+	public ${pojoName}RepositoryImpl(${pojoName}DAO ${pojoNameLower}DAO) {
+		super(${pojoNameLower}DAO);
+	}
+
+	@Override
+	public ${pojoName}DO create() {
+		return new ${pojoName}DO();
+	}
+
+	@Override
+	public Class<${pojoName}DO> getDoClazz() {
+		return ${pojoName}DO.class;
+	}
+
+	@Override
+	public Class<${pojoName}> getMclazz() {
+		return ${pojoName}.class;
+	}
+
+}

@@ -1,0 +1,85 @@
+one-boot.version: 1.0.0-SNAPSHOT
+
+application: 
+  url: 
+  
+# logging path
+logging:
+  path: ./logs
+  level:
+    com.codeaone.codefactory.mapper: debug
+    org.springframework.security: info 
+    com.codeaone.project.repository.mapper: debug
+    httpclient: info
+    
+static:
+  file:
+    localpath: D:/leibo/upload/static/
+    http-path: http://127.0.0.1:8080/static/
+    upload-path: D:/leibo/upload/
+
+server:
+  servlet:
+    session:
+      timeout: 43200 # session\u8d85\u65f6\u65f6\u95f4\u4e3a 12\u5c0f\u65f6
+    context-path: 
+  port: 8082
+  compression:
+    enabled: true
+  tomcat:
+    # tomcat\u7684URI\u7f16\u7801
+    uri-encoding: UTF-8
+    # tomcat\u6700\u5927\u7ebf\u7a0b\u6570\uff0c\u9ed8\u8ba4\u4e3a200
+    max-threads: 20
+    # Tomcat\u542f\u52a8\u521d\u59cb\u5316\u7684\u7ebf\u7a0b\u6570\uff0c\u9ed8\u8ba4\u503c25
+    min-spare-threads: 10
+    
+# MyBatis Plus
+mybatis-plus:
+  mapper-locations: classpath:mapper/**/*Mapper.xml
+  config-location: classpath:mapper/config/mybatis-config.xml
+spring:
+  application:
+    name: projectprod
+  activiti:
+    # \u81ea\u52a8\u5efa\u8868
+    database-schema: lbd
+    database-schema-update: true
+    history-level: full
+    db-history-used: true
+  # \u6a21\u677f\u5f15\u64ce
+  thymeleaf:
+    mode: HTML
+    encoding: utf-8
+    # \u7981\u7528\u7f13\u5b58
+    cache: false
+  # \u6587\u4ef6\u4e0a\u4f20
+  servlet:
+     multipart:
+       # \u5355\u4e2a\u6587\u4ef6\u5927\u5c0f
+       max-file-size:  10MB
+       # \u8bbe\u7f6e\u603b\u4e0a\u4f20\u7684\u6587\u4ef6\u5927\u5c0f
+       max-request-size:  20MB
+  # \u8d44\u6e90\u4fe1\u606f
+  messages:
+    # \u56fd\u9645\u5316\u8d44\u6e90\u6587\u4ef6\u8def\u5f84
+    encoding: UTF-8
+    basename: messages/messages_zh_CN
+  ### \u6307\u5b9a\u7528\u4ec0\u4e48\u5b58\u50a8session\u4fe1\u606f redis
+  session:
+    store-type: none
+  resources: 
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${static.file.localpath}
+    
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+
+  datasource:
+    #mysql\u7248\u672c\u4e3a8.0.13
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/cloudall?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&serverTimezone=Asia/Shanghai
+    username: dev
+    password: devQAZ13
+
+

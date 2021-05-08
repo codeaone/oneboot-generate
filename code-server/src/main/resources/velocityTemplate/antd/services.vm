@@ -1,0 +1,90 @@
+import {request} from '@/common';
+import qs from 'qs';
+
+const path = '${antdUpName}s';
+/**
+ * 分页查询方式
+ */
+export async function query(params) {
+  return request.get(path, {
+    params
+  });
+}
+
+/**
+ * 提交增加的数据
+ */
+export async function create(params) {
+  return request.post(path, {
+    body: qs.stringify(params)
+  });
+}
+
+export async function importFile(params) {
+  return request.post(`${path}/import`, {
+    body: qs.stringify(params)
+  });
+}
+
+/**
+ */
+export async function importCheck(params) {
+  return request.get(`${path}/import/check`, {
+    params
+  });
+}
+
+/**
+ */
+export async function exportCheck(params) {
+  return request.get(`${path}/export/check`, {
+    params
+  });
+}
+
+/**
+ * 请求服务器获取一些共用的数据
+ */
+export async function donew(params) {
+  return request.get(`${path}/new`, {
+    params
+  });
+}
+
+/**
+ * 查看数据的详情
+ */
+export async function show(params) {
+  const id = params.currentItem.id;
+  return request.get(`${path}/${id}`);
+}
+
+/**
+ * 修改前需要显示的数据
+ */
+export async function edit(params) {
+  const id = params.currentItem.id;
+  return request.get(`${path}/${id}/edit`);
+}
+
+/**
+ * 执行删除数据
+ */
+export async function remove(id) {
+  return request.delete(`${path}/${id}`);
+}
+
+/**
+ * 执行更新操作
+ */
+export async function update(params) {
+  return request.patch(`${path}/${params.id}`, {
+    body: qs.stringify(params)
+  });
+}
+
+export async function updateBatch(params) {
+  return request.patch(`${path}/${params.id}/batch`, {
+    body: qs.stringify(params)
+  });
+}

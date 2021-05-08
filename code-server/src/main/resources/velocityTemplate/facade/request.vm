@@ -1,0 +1,45 @@
+package ${basepackage}.common.facade.request;
+import com.codeaone.boot.core.request.PagedQueryRequest;
+
+import lombok.Getter;
+import lombok.Setter;
+
+#if(${isExistDateType})
+import java.util.Date;
+#end
+
+
+/**
+ * 新建表單提交內容
+ * @author tushiqiao
+ * @version $Id: ${pojoName}Request.java, v 0.1
+ */
+@Setter
+@Getter
+public class ${pojoName}Request extends PagedQueryRequest {
+
+	/** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+#foreach ($op in ${ops})
+#if (${op.add})
+#if(${op.searcherLike})
+    /** ${op.desc}  */
+    private ${op.type}            ${op.name}Like;
+#end
+#if(${op.otype} == "date_start_end")
+    /** ${op.desc} Start 开始 */
+    private ${op.type}            ${op.name}Start;
+
+    /** ${op.desc} End 结束 */
+    private ${op.type}            ${op.name}End;
+    
+    private ${op.type}            ${op.name};
+
+#else
+    /** ${op.desc}  ${op.enumLink}*/
+    private ${op.type}            ${op.name};
+#end
+#end
+#end
+
+}

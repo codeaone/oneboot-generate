@@ -1,0 +1,41 @@
+package ${basepackage}.localcache;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.codeaone.boot.cache.manager.AbstractCacheManager;
+import ${basepackage}.repository.${pojoName}Repository;
+
+/**
+ * 
+ * @author auto general
+ * @version $Id: ${pojoName}CacheManager.java
+ */
+@Service
+public class ${pojoName}CacheManager extends AbstractCacheManager {
+
+    @Autowired
+    private ${pojoName}Repository ${pojoNameLower}Repository;
+
+    /** 
+     */
+    @Override
+    public CacheName getCacheName() {
+        return CacheName.APP_INFO;
+    }
+
+    /** 
+     */
+    @Override
+    protected String getCacheInfo() {
+        return ${pojoName}Cache.getCacheInfo();
+    }
+
+    /** 
+     */
+    @Override
+    protected void loadingCache() {
+        ${pojoName}Cache.putAll(${pojoNameLower}Repository.findAll());
+    }
+
+}

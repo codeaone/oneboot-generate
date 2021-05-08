@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="BaseSearcher"
+			type="org.oneboot.core.mybatis.model.BaseSearcher" />
+		<typeAlias alias="Money" type="org.oneboot.core.lang.math.Money" />
+		<typeAlias alias="MoneyTypeHandler" type="org.oneboot.core.mybatis.MoneyTypeHandler" />
+		<package name="org.oneboot.pro.example.test.entity" />
+
+	</typeAliases>
+
+	<typeHandlers>
+		<typeHandler javaType="org.oneboot.core.lang.math.Money"
+			handler="org.oneboot.core.mybatis.MoneyTypeHandler" />
+	</typeHandlers>
+
+	<mappers>
+	</mappers>
+</configuration>

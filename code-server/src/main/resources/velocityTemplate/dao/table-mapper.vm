@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${basepackage}.repository.mapper.${pojoName}DAO">
+
+	<resultMap id="${pojoNameLower}Map"
+		type="${basepackage}.repository.domain.${pojoName}DO">
+#if (${key.autoIncrement})
+		<id property="${key.name}" column="${key.dbName}" />
+#end
+#foreach ($field in ${fields})
+		<result property="${field.name}" column="${field.dbName}" />
+#end
+
+	</resultMap>
+
+
+</mapper>

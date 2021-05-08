@@ -1,0 +1,54 @@
+package ${basepackage}.controller.${modelName};
+
+import com.codeaone.boot.mvc.base.BaseForm;
+
+import lombok.Getter;
+import lombok.Setter;
+
+#if(${isExistDateType})
+import java.util.Date;
+import org.springframework.format.annotation.DateTimeFormat;
+#end
+
+
+/**
+ * 新建表單提交內容
+ * @author tushiqiao
+ * @version $Id: ${pojoName}Form.java, v 0.1 2016年8月27日 下午1:13:55 tushiqiao Exp $
+ */
+@Setter
+@Getter
+public class ${pojoName}Form extends BaseForm {
+
+	/** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+#foreach ($op in ${ops})
+#if (${op.add})
+#if(${op.searcherLike})
+    /** ${op.desc}  */
+    private ${op.type}            ${op.name}Like;
+#end
+#if(${op.otype} == "date_start_end")
+    /** ${op.desc} Start 开始 */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private ${op.type}            ${op.name}Start;
+
+    /** ${op.desc} End 结束 */
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private ${op.type}            ${op.name}End;
+    
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private ${op.type}            ${op.name};
+
+#else
+    /** ${op.desc}  ${op.enumLink}*/
+#if(${op.type} == "Date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+#end
+    private ${op.type}            ${op.name};
+    
+#end
+#end
+#end
+
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="expires" content="60" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="renderer" content="webkit" />
+<!-- 让360浏览器默认选择webkit内核 -->
+<title th:text="${SYS_TITLE }"/>
+<link rel="icon" href="./favicon.png" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" media="all"
+	th:href="@{./dist/pro/umi.css(v=${JS_VERSION})}"
+	href="./dist/pro/umi.css" />
+<script th:inline="javascript">
+	//window.path = 'https://ll.zjhuishu.com/voiceprod/';
+	window.path = '/sptrade/';
+	 window.isDev = true;
+
+	
+</script>
+<script>window.routerBase = "./dist/pro/";</script>
+</head>
+<body>
+	<noscript>Out-of-the-box mid-stage front/design solution!</noscript>
+    
+      <div class="page-loading-warp">
+        <div class="ant-spin ant-spin-lg ant-spin-spinning">
+          <span class="ant-spin-dot ant-spin-dot-spin"
+            ><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i
+            ><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i
+          ></span>
+        </div>
+      </div>
+    </div>
+	<script th:src="@{./dist/pro/umi.js(v=${JS_VERSION})}"
+		src="./dist/pro/umi.js"></script>
+</body>
+</html>

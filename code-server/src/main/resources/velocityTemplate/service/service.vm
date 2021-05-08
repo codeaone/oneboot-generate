@@ -1,0 +1,17 @@
+package ${basepackage}.repository;
+
+import ${basepackage}.repository.domain.${pojoName}DO;
+import ${basepackage}.model.models.${pojoName};
+
+import com.codeaone.boot.mybatis.base.IRepository;
+
+/**
+ * 
+ * auto general
+ * @author
+ * @version $Id: ${pojoName}Repository.java, v 0.1 Exp $
+ */
+public interface ${pojoName}Repository extends IRepository<${pojoName}, ${pojoName}DO> {
+	
+
+}

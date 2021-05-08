@@ -1,0 +1,14 @@
+package ${basepackage}.repository.mapper;
+
+import com.codeaone.boot.mybatis.base.BaseDAO;
+import ${basepackage}.repository.domain.${pojoName}DO;
+
+/**
+ *
+ * 
+ * @author auto general
+ * @version $Id: ${pojoName}DAO.java, v 0.1 Exp $
+ */
+public interface ${pojoName}DAO extends BaseDAO<${pojoName}DO> {
+
+}

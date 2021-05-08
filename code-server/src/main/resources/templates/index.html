@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="expires" content="60" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="renderer" content="webkit" />
+<!-- 让360浏览器默认选择webkit内核 -->
+<title th:text="${SYS_TITLE }"/>
+<link rel="icon" href="/static/favicon.png" type="image/x-icon" />
+<link rel="stylesheet" type="text/css" media="all"
+	th:href="@{/dist/pro/umi.css(v=${JS_VERSION})}"
+	href="/dist/pro/umi.css" />
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=cQIR7UpN2SuoTeRX44ecs0IvDRGus3wG"></script>
+<script src="http://passport.cnblogs.com/scripts/jsencrypt.min.js"></script>
+<link rel="stylesheet" href="https://g.alicdn.com/de/prismplayer/2.9.3/skins/default/aliplayer-min.css" />
+<script type="text/javascript" charset="utf-8" src="https://g.alicdn.com/de/prismplayer/2.9.3/aliplayer-min.js"></script>
+
+<link rel="stylesheet" type="text/css" media="all" href="/static/home_load.css" />
+<script th:inline="javascript">
+	//window.path = 'https://ll.zjhuishu.com/voiceprod/';
+	window.path = '';
+	 window.isDev = true;
+	 
+	//登录用户信息
+		window.user = eval('(' + [[${user}]] + ')');
+		//导航数据配置
+		window.menus = eval('(' + [[${menus}]] + ')');
+
+	 window.setting = {
+        // "layout": "topmenu",
+        // "contentWidth": "Fixed",
+        "title": "续联修复"
+      }
+
+  </script>
+
+</script>
+<script>
+window.routerBase = "/page/";
+//window.publicPath = 'https://cdn.zjhuishu.com/file/recharge/static/
+window.publicPath = '/dist/pro/';
+</script>
+<script>
+(function (doc, win) {
+    var docEl = doc.documentElement,
+        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+        recalc = function () {
+            var clientWidth = docEl.clientWidth;
+            if (!clientWidth) return;
+            if (clientWidth >= 1920) {
+                docEl.style.fontSize = '100px'; //1rem  = 100px
+            } else {
+                docEl.style.fontSize = 100 * (clientWidth / 1920) + 'px';
+            }
+        };
+    if (!doc.addEventListener) return;
+    win.addEventListener(resizeEvt, recalc, false);
+    doc.addEventListener('DOMContentLoaded', recalc, false);
+})(document, window);
+</script>
+</head>
+<body>
+	<noscript>Out-of-the-box mid-stage front/design solution!</noscript>
+    <div id="root">
+      <div style="display: flex; justify-content: center; align-items: center; flex-direction: column; min-height: 420px; height: 100%">
+        <img src="/static/home_logo.png" alt="logo" width="256" />
+        <div class="page-loading-warp">
+          <div class="ant-spin ant-spin-lg ant-spin-spinning">
+            <span class="ant-spin-dot ant-spin-dot-spin"><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i></span>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: center; align-items: center">
+          <!-- <img src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg" width="32" style="margin-right: 8px" />
+          Ant Design -->
+          洞头交通运输综合服务平台
+        </div>
+      </div>
+    </div>
+	<script th:src="@{/dist/pro/umi.js(v=${JS_VERSION})}"
+		src="/dist/pro/umi.js"></script>
+</body>
+</html>
